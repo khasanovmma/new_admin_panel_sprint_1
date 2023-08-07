@@ -40,7 +40,7 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
 
     title = models.CharField(_("title"), max_length=255)
     description = models.TextField(_("description"))
-    creation_date = models.DateField(_("creation_date"))
+    creation_date = models.DateField(_("creation date"))
     type = models.CharField(
         _("type"), choices=FilmworkTypes.choices, default=FilmworkTypes.MOVIE
     )
@@ -50,11 +50,13 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
     genres = models.ManyToManyField(
         "Genre", through="GenreFilmwork", verbose_name=_("genres")
     )
+    certificate = models.CharField(_('certificate'), max_length=512, blank=True)
+    file_path = models.FileField(_('file'), blank=True, null=True, upload_to='movies/')
 
     class Meta:
         db_table = 'content"."filmwork'
-        verbose_name = _("film work")
-        verbose_name_plural = _("film works")
+        verbose_name = _("filmwork")
+        verbose_name_plural = _("filmworks")
 
     def __str__(self):
         return self.title
@@ -62,7 +64,7 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
 
 class GenreFilmwork(UUIDMixin):
     film_work = models.ForeignKey(
-        "Filmwork", on_delete=models.CASCADE, verbose_name=_("film work")
+        "Filmwork", on_delete=models.CASCADE, verbose_name=_("filmwork")
     )
     genre = models.ForeignKey(
         "Genre", on_delete=models.CASCADE, verbose_name=_("genre")
@@ -78,7 +80,7 @@ class GenreFilmwork(UUIDMixin):
 class Person(UUIDMixin, TimeStampedMixin):
     full_name = models.CharField(_("full name"), max_length=120)
     film_work = models.ManyToManyField(
-        "Filmwork", through="PersonFilmwork", verbose_name=_("film work")
+        "Filmwork", through="PersonFilmwork", verbose_name=_("filmwork")
     )
 
     class Meta:
@@ -92,7 +94,7 @@ class Person(UUIDMixin, TimeStampedMixin):
 
 class PersonFilmwork(UUIDMixin):
     film_work = models.ForeignKey(
-        "Filmwork", on_delete=models.CASCADE, verbose_name=_("film work")
+        "Filmwork", on_delete=models.CASCADE, verbose_name=_("filmwork")
     )
     person = models.ForeignKey(
         "Person", on_delete=models.CASCADE, verbose_name=_("person")
@@ -102,5 +104,5 @@ class PersonFilmwork(UUIDMixin):
 
     class Meta:
         db_table = 'content"."person_film_work'
-        verbose_name = _("person film work")
-        verbose_name_plural = _("persons film works")
+        verbose_name = _("person filmwork")
+        verbose_name_plural = _("persons filmworks")
