@@ -1,20 +1,29 @@
 from uuid import UUID, uuid4
 from contextlib import contextmanager
 from dataclasses import dataclass, field
-from datetime import datetime, date
+from datetime import datetime, date, timezone
 from typing import Literal, Optional
 import sqlite3
 
 
 @dataclass
 class UUIDMixin:
-    id: UUID = field(default_factory=uuid4)
+    id: UUID = field(default=None)
 
 
 @dataclass
-class TimeStampedMixin:
-    created: field(default=None)
-    modified: field(default=None)
+class CreatedAtMixin:
+    created_at: field(default=None)
+
+
+@dataclass
+class UpdatedAtMixin:
+    updated_at: field(default=None)
+
+
+@dataclass
+class TimeStampedMixin(CreatedAtMixin, UpdatedAtMixin):
+    pass
 
 
 @dataclass
@@ -29,16 +38,15 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
 
 
 @dataclass
-class Genre(UUIDMixin):
+class Genre(UUIDMixin, TimeStampedMixin):
     name: str = field(default="")
     description: Optional[str] = field(default="")
 
 
 @dataclass
-class GenreFilmwork(UUIDMixin):
+class GenreFilmwork(UUIDMixin, CreatedAtMixin):
     film_work_id: UUID = field(default_factory=uuid4)
     genre_id: UUID = field(default_factory=uuid4)
-    created: Optional[datetime] = field(default=None)
 
 
 @dataclass
@@ -48,11 +56,10 @@ class Person(UUIDMixin, TimeStampedMixin):
 
 
 @dataclass
-class PersonFilmwork(UUIDMixin):
+class PersonFilmwork(UUIDMixin, CreatedAtMixin):
     film_work_id: UUID = field(default_factory=uuid4)
     person_id: UUID = field(default_factory=uuid4)
     role: Literal["actor", "director", "witer"] = field(default="actor")
-    created: Optional[datetime] = field(default=None)
 
 
 TABLES = [Genre, Person, Filmwork, PersonFilmwork, GenreFilmwork]
