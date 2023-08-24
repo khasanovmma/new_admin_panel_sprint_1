@@ -16,9 +16,9 @@ db_path = "db.sqlite"
 
 class SQLiteExtractor:
     TABLE_MAP = {
+        "film_work": Filmwork,
         "genre": Genre,
         "person": Person,
-        "film_work": Filmwork,
         "person_film_work": PersonFilmwork,
         "genre_film_work": GenreFilmwork,
     }
@@ -40,6 +40,7 @@ class SQLiteExtractor:
             movies[table_name] = batches
         return movies
 
+
 class PostgresSaver:
     def __init__(self, connection: _connection) -> None:
         self.connection = connection
@@ -49,17 +50,22 @@ class PostgresSaver:
         for table_name, instances in data.items():
             self.clear_database(table_name=table_name)
             column_names = [field.name for field in fields(instances[0])]
-            column_count = ', '.join(['%s'] * len(column_names))
-            bind_values = ','.join(self.cursor.mogrify(f"({column_count})", row).decode('utf-8') for row in astuple())
-    
-    def clear_database(self, table_name):
-        self.cursor.execute(f"TRUNCATE content.{table_name};")
+            column_counts = ", ".join(["%s"] * len(column_names))
+            self.cursor.mogrify(f"({column_counts})")
+            bind_values = [ astuple(item) for item in instances]
+          
+            query = (
+                f"INSERT INTO content.{table_name} ({', '.join(column_names)}) VALUES ({column_counts}) "
+                f" ON CONFLICT (id) DO NOTHING"
+            )
+            self.cursor.executemany(query, bind_values)
+            self.connection.commit()
 
-    
+    def clear_database(self, table_name):
+        self.cursor.execute(f"TRUNCATE content.{table_name} CASCADE;")
+
     def get_column_names(self, instances):
         return [field.name for field in fields(instances)]
-    
-
 
 
 def load_from_sqlite(connection: sqlite3.Connection, pg_conn: _connection):
