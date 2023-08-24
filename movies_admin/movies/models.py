@@ -5,12 +5,25 @@ from django.utils.translation import gettext_lazy as _
 import uuid
 
 
-class TimeStampedMixin(models.Model):
-    created = models.DateTimeField(_("created"), auto_now_add=True)
-    modified = models.DateTimeField(_("modified"), auto_now=True)
+class CreatedAtMixin(models.Model):
+    created_at = models.DateTimeField(_("created"), auto_now_add=True)
 
     class Meta:
         abstract = True
+
+
+class UpdatedAtMixin(models.Model):
+    updated_at = models.DateTimeField(_("modified"), auto_now=True)
+
+    class Meta:
+        abstract = True
+
+
+class TimeStampedMixin(CreatedAtMixin, UpdatedAtMixin):
+    pass
+
+    class Meta:
+            abstract = True
 
 
 class UUIDMixin(models.Model):
@@ -50,8 +63,7 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
     genres = models.ManyToManyField(
         "Genre", through="GenreFilmwork", verbose_name=_("genres")
     )
-    certificate = models.CharField(_('certificate'), max_length=512, blank=True)
-    file_path = models.FileField(_('file'), blank=True, null=True, upload_to='movies/')
+    file_path = models.FileField(_("file"), blank=True, null=True, upload_to="movies/")
 
     class Meta:
         db_table = 'content"."filmwork'
@@ -62,14 +74,13 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
         return self.title
 
 
-class GenreFilmwork(UUIDMixin):
+class GenreFilmwork(UUIDMixin, CreatedAtMixin):
     film_work = models.ForeignKey(
         "Filmwork", on_delete=models.CASCADE, verbose_name=_("filmwork")
     )
     genre = models.ForeignKey(
         "Genre", on_delete=models.CASCADE, verbose_name=_("genre")
     )
-    created = models.DateTimeField(_("created"), auto_now_add=True)
 
     class Meta:
         db_table = 'content"."genre_film_work'
@@ -92,7 +103,7 @@ class Person(UUIDMixin, TimeStampedMixin):
         return self.full_name
 
 
-class PersonFilmwork(UUIDMixin):
+class PersonFilmwork(UUIDMixin, CreatedAtMixin):
     film_work = models.ForeignKey(
         "Filmwork", on_delete=models.CASCADE, verbose_name=_("filmwork")
     )
@@ -100,7 +111,6 @@ class PersonFilmwork(UUIDMixin):
         "Person", on_delete=models.CASCADE, verbose_name=_("person")
     )
     role = models.TextField("role", null=True)
-    created = models.DateTimeField(verbose_name=_("created"), auto_now_add=True)
 
     class Meta:
         db_table = 'content"."person_film_work'

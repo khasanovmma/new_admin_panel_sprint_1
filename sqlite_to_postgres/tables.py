@@ -32,8 +32,7 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
     description: str = field(default="")
     creation_date: Optional[date] = field(default="")
     type: Literal["movie", "tv show"] = field(default="movie")
-    certificate: Optional[str] = field(default="")
-    file_path: Optional[str] = field(default="")
+    file_path: Optional[str] = field(default=None)
     rating: float = field(default=0.0)
 
 
@@ -52,7 +51,6 @@ class GenreFilmwork(UUIDMixin, CreatedAtMixin):
 @dataclass
 class Person(UUIDMixin, TimeStampedMixin):
     full_name: str = field(default="")
-    film_work_id: UUID = field(default_factory=uuid4)
 
 
 @dataclass
