@@ -11,4 +11,4 @@ PG_DATABASE = {
     "port": env.int("PG_DB_PORT", 5432),
 }
 
-SQL_DB_PATH = env.str("SQLITE", "db.sqlite")
+SQL_DB_PATH = env.str("SQLITE_DB_PATH", "db.sqlite")

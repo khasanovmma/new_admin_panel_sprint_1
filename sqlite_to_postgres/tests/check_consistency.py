@@ -1,10 +1,26 @@
 import collections
 import unittest
+import sqlite3
 
-from ..config import SQL_DB_PATH, PG_DATABASE
+import psycopg2
+from environs import Env
 
-cursor_sqlite = SQL_DB_PATH.cursor()
-cursor_postgresql = PG_DATABASE.cursor()
+env = Env()
+env.read_env()
+
+sqlite_conn = sqlite3.connect(env.str("SQLITE_DB_PATH", "../db.sqlite"))
+
+pg_conn = psycopg2.connect(
+    dbname=env.str("PG_DB_NAME"),
+    user=env.str("PG_DB_USER"),
+    password=env.str("PG_DB_PASSWORD"),
+    host=env.str("PG_DB_HOST", "127.0.0.1"),
+    port=env.int("PG_DB_PORT", 5432),
+)
+
+
+cursor_sqlite = sqlite_conn.cursor()
+cursor_postgresql = pg_conn.cursor()
 
 
 class TestPrime(unittest.TestCase):
@@ -102,3 +118,7 @@ class TestPrime(unittest.TestCase):
         self.assertTrue(
             collections.Counter(postgreslq_result) == collections.Counter(sqlite_result)
         )
+
+
+if __name__ == "__main__":
+    unittest.main()
