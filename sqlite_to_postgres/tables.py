@@ -1,24 +1,22 @@
-from uuid import UUID, uuid4
-from contextlib import contextmanager
+from uuid import UUID
 from dataclasses import dataclass, field
-from datetime import datetime, date, timezone
+from datetime import datetime, date
 from typing import Literal, Optional
-import sqlite3
 
 
 @dataclass
 class UUIDMixin:
-    id: UUID = field(default=None)
+    id: UUID
 
 
 @dataclass
 class CreatedAtMixin:
-    created_at: field(default=None)
+    created_at: datetime
 
 
 @dataclass
 class UpdatedAtMixin:
-    updated_at: field(default=None)
+    updated_at: datetime
 
 
 @dataclass
@@ -30,7 +28,7 @@ class TimeStampedMixin(CreatedAtMixin, UpdatedAtMixin):
 class Filmwork(UUIDMixin, TimeStampedMixin):
     title: str = field(default="")
     description: str = field(default="")
-    creation_date: Optional[date] = field(default="")
+    creation_date: Optional[date] = field(default=None)
     type: Literal["movie", "tv show"] = field(default="movie")
     file_path: Optional[str] = field(default=None)
     rating: float = field(default=0.0)
@@ -44,8 +42,8 @@ class Genre(UUIDMixin, TimeStampedMixin):
 
 @dataclass
 class GenreFilmwork(UUIDMixin, CreatedAtMixin):
-    film_work_id: UUID = field(default_factory=uuid4)
-    genre_id: UUID = field(default_factory=uuid4)
+    film_work_id: UUID = field()
+    genre_id: UUID = field()
 
 
 @dataclass
@@ -55,8 +53,8 @@ class Person(UUIDMixin, TimeStampedMixin):
 
 @dataclass
 class PersonFilmwork(UUIDMixin, CreatedAtMixin):
-    film_work_id: UUID = field(default_factory=uuid4)
-    person_id: UUID = field(default_factory=uuid4)
+    film_work_id: UUID = field()
+    person_id: UUID = field()
     role: Literal["actor", "director", "witer"] = field(default="actor")
 
 
