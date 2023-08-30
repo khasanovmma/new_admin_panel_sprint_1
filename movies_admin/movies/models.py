@@ -23,7 +23,7 @@ class TimeStampedMixin(CreatedAtMixin, UpdatedAtMixin):
     pass
 
     class Meta:
-            abstract = True
+        abstract = True
 
 
 class UUIDMixin(models.Model):
@@ -66,7 +66,7 @@ class Filmwork(UUIDMixin, TimeStampedMixin):
     file_path = models.FileField(_("file"), blank=True, null=True, upload_to="movies/")
 
     class Meta:
-        db_table = 'content"."filmwork'
+        db_table = 'content"."film_work'
         verbose_name = _("filmwork")
         verbose_name_plural = _("filmworks")
 
@@ -86,6 +86,11 @@ class GenreFilmwork(UUIDMixin, CreatedAtMixin):
         db_table = 'content"."genre_film_work'
         verbose_name = _("genre filmwrok")
         verbose_name_plural = _("genres filmwroks")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["film_work", "genre"], name="unique_filmwork_genre"
+            )
+        ]
 
 
 class Person(UUIDMixin, TimeStampedMixin):
@@ -98,6 +103,7 @@ class Person(UUIDMixin, TimeStampedMixin):
         db_table = 'content"."person'
         verbose_name = _("person")
         verbose_name_plural = _("persons")
+        
 
     def __str__(self) -> str:
         return self.full_name
@@ -116,3 +122,8 @@ class PersonFilmwork(UUIDMixin, CreatedAtMixin):
         db_table = 'content"."person_film_work'
         verbose_name = _("person filmwork")
         verbose_name_plural = _("persons filmworks")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["film_work", "person", "role"], name="unique_filmwork_person_role"
+            )
+        ]

@@ -8,6 +8,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env()
 
+env.read_env()
+
 SECRET_KEY = env.str("SECRET_KEY")
 
 DEBUG = env.bool("DEBUG", True)
